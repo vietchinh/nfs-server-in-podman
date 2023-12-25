@@ -1,8 +1,6 @@
 FROM registry.fedoraproject.org/fedora:latest
 MAINTAINER vietchinh
 
-VOLUME ["/etc/exports"]
-
 RUN dnf install systemd nfs-utils dnf-automatic --setopt=install_weak_deps=False --nodocs -y && \
     dnf clean all
 
