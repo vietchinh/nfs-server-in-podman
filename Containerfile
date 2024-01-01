@@ -2,8 +2,7 @@ FROM registry.fedoraproject.org/fedora:latest
 MAINTAINER vietchinh
 
 
-RUN mkdir -p /var/lib/nfs/ && \
-    useradd auser
+RUN mkdir -p /var/lib/nfs/
 
 RUN dnf install systemd nfs-utils dnf-automatic --setopt=install_weak_deps=False --nodocs -y && \
     dnf clean all
