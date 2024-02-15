@@ -10,8 +10,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-push-image:
+  matrix-setup:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          generated_matrix=$((echo {\"version\":[ && cat && echo ]}) <<< $(curl https://packages.fedoraproject.org/pkgs/nfs-utils/nfs-utils/fedora-39-updates.html | grep -zPoh -m 1 -- "nfs-utils-\d+.\d+.\d+-\d+.fc39 - Fedora Packages|\d+.\d+.\d+-\d+.rc\d+.fc39 - Fedora Packages" | head -1 | sed -r 's/\- Fedora Packages//g' | tr -d ' ' | tr -d '\0' | awk '{ print "\""$0"\""}') | jq -c .)
+          echo $generated_matrix
+          echo "matrix=$generated_matrix" >> $GITHUB_OUTPUT
+
+  build-and-push-image:
+    needs: matrix-setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.matrix-setup.outputs.matrix)}}
     permissions:
       contents: read
       packages: write
@@ -24,7 +38,9 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
-          flavor: latest=true
+          tags: type=raw,value=${{ matrix.version }}
+          flavor: |
+            latest=true
       - name: Install latest podman + buildah
         run: |
           sudo mkdir -p /etc/apt/keyrings
@@ -47,13 +63,14 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           oci: true
           layers: true
+          build-args: |
+            PACKAGE_VERSION=${{ matrix.version }}
+            FEDORA_VERSION=39
       - name: Push To GHCR
         uses: redhat-actions/push-to-registry@v2
         id: push
         with:
-          image: ${{ steps.build_image.outputs.image }}
           tags: ${{ steps.build_image.outputs.tags }}
-          registry: ghcr.io/${{ github.repository_owner }}
           username: ${{ github.actor }}
           password: ${{ github.token }}
           extra-args: |

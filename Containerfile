@@ -1,10 +1,13 @@
-FROM registry.fedoraproject.org/fedora:latest
+ARG FEDORA_VERSION
+
+FROM registry.fedoraproject.org/fedora:${FEDORA_VERSION}
 MAINTAINER vietchinh
 
+ARG PACKAGE_VERSION
 
 RUN mkdir -p /var/lib/nfs/
 
-RUN dnf install systemd nfs-utils dnf-automatic --setopt=install_weak_deps=False --nodocs -y && \
+RUN dnf install systemd nfs-utils-${PACKAGE_VERSION} dnf-automatic --setopt=install_weak_deps=False --nodocs -y && \
     dnf clean all
 
 RUN (cd /usr/lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
