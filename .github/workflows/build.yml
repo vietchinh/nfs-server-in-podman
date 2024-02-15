@@ -17,7 +17,7 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          generated_matrix=$((echo {\"version\":[ && cat && echo ]}) <<< $(curl https://raw.githubusercontent.com/OpenMandrivaAssociation/nfs-utils/master/nfs-utils.spec | grep -zPoh -m 1 -- "\d+.\d+.\d+\n" | head -1 | tr -d '\n' | tr -d '\0' | awk '{ print "\""$0"\""}') | jq -c .)
+          generated_matrix=$((echo {\"version\":[ && cat && echo ]}) <<< $(curl https://packages.fedoraproject.org/pkgs/nfs-utils/nfs-utils/fedora-39-updates.html | grep -zPoh -m 1 -- "nfs-utils-\d+.\d+.\d+-\d+.fc39 - Fedora Packages|\d+.\d+.\d+-\d+.rc\d+.fc39 - Fedora Packages" | head -1 | sed -r 's/\- Fedora Packages//g' | tr -d ' ' | tr -d '\0' | awk '{ print "\""$0"\""}') | jq -c .)
           echo $generated_matrix
           echo "matrix=$generated_matrix" >> $GITHUB_OUTPUT
 
