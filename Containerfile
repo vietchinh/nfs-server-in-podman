@@ -6,7 +6,7 @@ MAINTAINER vietchinh
 ARG PACKAGE_VERSION
 
 RUN mkdir -p /var/lib/nfs/ && \
-    useradd -rm -g root -G auser
+    useradd -rm -g root -u 1000 auser
 
 RUN dnf install systemd nfs-utils-${PACKAGE_VERSION} dnf-automatic --setopt=install_weak_deps=False --nodocs -y && \
     dnf clean all
