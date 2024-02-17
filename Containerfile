@@ -19,6 +19,6 @@ RUN (cd /usr/lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == sy
     rm -f /usr/lib/systemd/system/sockets.target.wants/*initctl*; \
     rm -f /usr/lib/systemd/system/basic.target.wants/*; \
     rm -f /usr/lib/systemd/system/anaconda.target.wants/*; \
-    systemctl enable rpcbind nfs-server
+    systemctl enable nfs-server; systemctl mask rpc-statd.service rpcbind.service rpcbind.socket
 
 CMD ["/sbin/init"]
