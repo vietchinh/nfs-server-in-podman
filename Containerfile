@@ -8,7 +8,7 @@ ARG PACKAGE_VERSION
 RUN mkdir -p /var/lib/nfs/ && \
     useradd auser
 
-RUN dnf install systemd nfs-utils-${PACKAGE_VERSION} dnf-automatic --setopt=install_weak_deps=False --nodocs -y && \
+RUN dnf install systemd nfs-utils-${PACKAGE_VERSION} --setopt=install_weak_deps=False --nodocs -y && \
     dnf clean all
 
 RUN (cd /usr/lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
@@ -19,6 +19,6 @@ RUN (cd /usr/lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == sy
     rm -f /usr/lib/systemd/system/sockets.target.wants/*initctl*; \
     rm -f /usr/lib/systemd/system/basic.target.wants/*; \
     rm -f /usr/lib/systemd/system/anaconda.target.wants/*; \
-    systemctl enable rpcbind nfs-server; systemctl enable dnf-automatic-install.timer
+    systemctl enable rpcbind nfs-server
 
 CMD ["/sbin/init"]
