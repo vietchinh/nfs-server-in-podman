@@ -9,6 +9,10 @@ on:
       - "**.md"
   workflow_dispatch:
 
+
+env:
+  FEDORA_VERSION: 40
+
 jobs:
   matrix-setup:
     runs-on: ubuntu-latest
@@ -17,7 +21,7 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          generated_matrix=$((echo {\"version\":[ && cat && echo ]}) <<< $(curl https://packages.fedoraproject.org/pkgs/nfs-utils/nfs-utils/fedora-39-updates.html | grep -zPoh -m 1 -- "nfs-utils-\d+.\d+.\d+-\d+.fc39 - Fedora Packages|\d+.\d+.\d+-\d+.rc\d+.fc39 - Fedora Packages" | head -1 | sed -r 's/\- Fedora Packages//g' | tr -d ' ' | tr -d '\0' | awk '{ print "\""$0"\""}') | jq -c .)
+          generated_matrix=$((echo {\"version\":[ && cat && echo ]}) <<< $(curl https://packages.fedoraproject.org/pkgs/nfs-utils/nfs-utils/fedora-${{ env.FEDORA_VERSION }}-updates.html | grep -zPoh -m 1 -- "nfs-utils-\d+.\d+.\d+-\d+.fc${{ env.FEDORA_VERSION }} - Fedora Packages|\d+.\d+.\d+-\d+.rc\d+.fc${{ env.FEDORA_VERSION }} - Fedora Packages" | head -1 | sed -r 's/\- Fedora Packages//g' | tr -d ' ' | tr -d '\0' | awk '{ print "\""$0"\""}') | jq -c .)
           echo $generated_matrix
           echo "matrix=$generated_matrix" >> $GITHUB_OUTPUT
 
@@ -65,7 +69,7 @@ jobs:
           layers: true
           build-args: |
             PACKAGE_VERSION=${{ matrix.version }}
-            FEDORA_VERSION=39
+            FEDORA_VERSION=${{ env.FEDORA_VERSION }}
       - name: Push To GHCR
         uses: redhat-actions/push-to-registry@v2
         id: push
