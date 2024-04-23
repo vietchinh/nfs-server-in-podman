@@ -65,7 +65,7 @@ jobs:
           layers: true
           build-args: |
             PACKAGE_VERSION=${{ matrix.version }}
-            FEDORA_VERSION=39
+            FEDORA_VERSION=40
       - name: Push To GHCR
         uses: redhat-actions/push-to-registry@v2
         id: push
